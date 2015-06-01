@@ -7,7 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -125,29 +128,39 @@ public class Utils {
 		}
 		return fileProperties;
 	}
+
+    public static String getStringRepresentationOfIp(InetAddress inetAddress){
+        return inetAddress == null ? null : inetAddress.getHostAddress();
+    }
+
+    public static InetAddress getLocalPublicIp() {
+        InetAddress myIp = null;
+        try {
+            myIp = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return myIp;
+    }
 	
-	public static String getStringRepresentationOfLocalIp(){
-		String ipStr = null;
-		try {
-			InetAddress myIp = InetAddress.getLocalHost();
-			ipStr = myIp.getHostAddress();
-		} 
-		catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		return ipStr;
-	}
-	
-	public static InetAddress getLocalIp(){
-		InetAddress myIp = null;
-		try {
-			myIp = InetAddress.getLocalHost();
-		} 
-		catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		return myIp;
-	}
+	public static InetAddress getLocalPrivateIp(){
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
+                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                while (inetAddresses.hasMoreElements()) {
+                    InetAddress inetAddress = inetAddresses.nextElement();
+                    if (inetAddress.isSiteLocalAddress()) {
+                        return inetAddress;
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 	
 	public static int utf8Length(CharSequence s) {
         int count = 0;
@@ -166,5 +179,4 @@ public class Utils {
         }
         return count;
     }
-	
 }
