@@ -60,12 +60,14 @@ public class Main {
 		
 		int myPort = wc.getInt(WorkerConfig.LISTENING_PORT);
 		int dataPort = wc.getInt(WorkerConfig.DATA_PORT);
+
+		InetAddress myIp = wc.getInt(WorkerConfig.NETWORK_INTERFACE) == 0 ? Utils.getLocalPrivateIp() : Utils.getLocalPublicIp();
 		
 		// Create workerMaster comm manager
 		Comm comm = new IOComm(new JavaSerializer(), Executors.newCachedThreadPool());
 		
 		// Create conductor
-		Conductor c = new Conductor(Utils.getLocalIp(), wc);
+		Conductor c = new Conductor(myIp, wc);
 		
 		// Start master-worker communication manager
 		WorkerMasterAPIImplementation api = new WorkerMasterAPIImplementation(comm, c, wc);
@@ -80,14 +82,13 @@ public class Main {
 		wwcm.start();
 		
 		// Bootstrap
-		String myIp = Utils.getStringRepresentationOfLocalIp();
-		api.bootstrap(masterConnection, myIp, myPort, dataPort);
+		api.bootstrap(masterConnection, Utils.getStringRepresentationOfIp(myIp), myPort, dataPort);
 		
 		// Configure metrics serving
 		this.configureMetricsReporting(wc);
 		
 		// Register JVM shutdown hook
-		registerShutdownHook(Utils.computeIdFromIpAndPort(Utils.getLocalIp(), myPort), c, masterConnection, api);
+		registerShutdownHook(Utils.computeIdFromIpAndPort(myIp, myPort), c, masterConnection, api);
 	}
 	
 	private void configureMetricsReporting(WorkerConfig wc){
