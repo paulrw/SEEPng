@@ -132,34 +132,20 @@ public class Utils {
     public static String getStringRepresentationOfIp(InetAddress inetAddress){
         return inetAddress == null ? null : inetAddress.getHostAddress();
     }
-
-    public static InetAddress getLocalPublicIp() {
-        InetAddress myIp = null;
-        try {
-            myIp = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return myIp;
-    }
 	
-	public static InetAddress getLocalPrivateIp(){
+	public static InetAddress getLocalIp(String networkIntefaceName){
         try {
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (networkInterfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = networkInterfaces.nextElement();
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (inetAddress.isSiteLocalAddress()) {
-                        return inetAddress;
-                    }
-                }
+            NetworkInterface networkInterface = NetworkInterface.getByName(networkIntefaceName);
+            if (networkInterface == null || !networkInterface.getInetAddresses().hasMoreElements()) {
+                LOG.error("No addresses for network interface", networkIntefaceName);
+                return null;
+            } else {
+                return networkInterface.getInetAddresses().nextElement();
             }
         } catch (SocketException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 	
 	public static int utf8Length(CharSequence s) {

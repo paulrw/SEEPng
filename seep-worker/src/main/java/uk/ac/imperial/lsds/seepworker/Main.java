@@ -61,7 +61,7 @@ public class Main {
 		int myPort = wc.getInt(WorkerConfig.LISTENING_PORT);
 		int dataPort = wc.getInt(WorkerConfig.DATA_PORT);
 
-		InetAddress myIp = wc.getInt(WorkerConfig.NETWORK_INTERFACE) == 0 ? Utils.getLocalPrivateIp() : Utils.getLocalPublicIp();
+		InetAddress myIp = Utils.getLocalIp(wc.getString(WorkerConfig.NETWORK_INTERFACE));
 		
 		// Create workerMaster comm manager
 		Comm comm = new IOComm(new JavaSerializer(), Executors.newCachedThreadPool());
@@ -124,11 +124,15 @@ public class Main {
 		instance.executeWorker(wc);
 	}
 	
-	private static boolean validateProperties(Properties validatedProperties){
-		if((!validatedProperties.containsKey(WorkerConfig.MASTER_IP)) ||
-				validatedProperties.getProperty(WorkerConfig.MASTER_IP) == null ||
-				validatedProperties.getProperty(WorkerConfig.MASTER_IP).equals("")){
-			LOG.error("Missing required parameter: {}", WorkerConfig.MASTER_IP);
+	private static boolean validateProperties(Properties properties) {
+        return validateStringProperty(WorkerConfig.MASTER_IP, properties) && validateStringProperty(WorkerConfig.NETWORK_INTERFACE, properties);
+    }
+
+    private static boolean validateStringProperty(String propertyName, Properties properties) {
+        if((!properties.containsKey(propertyName)) ||
+                properties.getProperty(propertyName) == null ||
+                properties.getProperty(propertyName).equals("")){
+			LOG.error("Missing required parameter: {}", propertyName);
 			return false;
 		}
 			

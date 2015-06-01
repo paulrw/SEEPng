@@ -73,7 +73,7 @@ public class WorkerConfig extends Config {
     private static final String REPORT_METRICS_JMX_DOC = "Activate JMX reporting. Requires MBeans plugin in visualVM to visualize";
 
     public static final String NETWORK_INTERFACE = "network.interface";
-    private static final String NETWORK_INTERFACE_DOC = "Network interface to use. Site local(0), public(1)";
+    private static final String NETWORK_INTERFACE_DOC = "Name of the network interface to use.";
 	static{
 		config = new ConfigDef().define(DEPLOYMENT_TARGET_TYPE, Type.INT, 0, Importance.HIGH, DEPLOYMENT_TARGET_TYPE_DOC)
 				.define(LISTENING_PORT, Type.INT, 3500, Importance.HIGH, LISTENING_PORT_DOC)
@@ -93,7 +93,7 @@ public class WorkerConfig extends Config {
 				.define(REPORT_METRICS_CONSOLE_PERIOD, Type.INT, -1, Importance.LOW, REPORT_METRICS_CONSOLE_PERIOD_DOC)
 				.define(REPORT_METRICS_JMX, Type.INT, 1, Importance.MEDIUM, REPORT_METRICS_JMX_DOC)
 				.define(PROPERTIES_FILE, Type.STRING, Importance.LOW, PROPERTIES_FILE_DOC)
-                .define(NETWORK_INTERFACE, Type.INT, 0, Importance.MEDIUM, NETWORK_INTERFACE_DOC);
+                .define(NETWORK_INTERFACE, Type.STRING, Importance.HIGH, NETWORK_INTERFACE_DOC);
 	}
 	
 	public WorkerConfig(Map<? extends Object, ? extends Object> originals) {
